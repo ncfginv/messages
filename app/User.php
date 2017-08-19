@@ -45,22 +45,23 @@ class User extends Model implements AuthenticatableContract,
     
     public function followings()
     {
-        return $this->belongsToMany(User::class,'user_follw','user_id','follow_id')->withTimestamps();
+        return $this->belongsToMany(User::class,'user_follow','user_id','follow_id')->withTimestamps();
     }
     
     public function followers()
     {
-        return $this->belongsToMany(User::class, 'user_follow', 'follow_id', 'user_id')->withTimestamps();
+        return $this->belongsToMany(User::class,'user_follow', 'follow_id', 'user_id')->withTimestamps();
     }
     
     public function follow($userId)
     {
-        // すでにフォローしているかの確認
+        // 既にフォローしているかの確認
         $exist = $this->is_following($userId);
-        // $its_me = $this->id == $userId;
+        // 自分自身ではないかの確認
+        $its_me = $this->id == $userId;
         
         if ($exist || $its_me) {
-            // すでにフォローしていれば何もしない
+            // 既にフォローしていれば何もしない
             return false;
         } else {
             // 未フォローであればフォローする
@@ -71,13 +72,13 @@ class User extends Model implements AuthenticatableContract,
     
     public function unfollow($userId)
     {
-        // すでにフォローしているかの確認
+        // 既にフォローしているかの確認
         $exist = $this->is_following($userId);
         // 自分自身ではないかの確認
-        $its_me = $this->id = $userId;
+        $its_me = $this->id == $userId;
         
         if ($exist && !$its_me) {
-            // すでにフォローしていればフォローを外す
+            // 既にフォローしていればフォローを外す
             $this->followings()->detach($userId);
             return true;
         } else {
@@ -87,6 +88,13 @@ class User extends Model implements AuthenticatableContract,
     }
     
     public function is_following($userId) {
-        return $this->followings()->where('follow_id',$userId)->exists();
+        return $this->followings()->where('follow_id', $userId)->exists();
     }
-}
+    
+    public function feed_microposts()
+    {
+        $follw_user_ids = $this->followings()->lists('users.id')->toArray();
+        $follow_user_ids[] = $this->id;
+        return Micropost::whereIn('user_id',$follow_user_ids);
+    }
+}   

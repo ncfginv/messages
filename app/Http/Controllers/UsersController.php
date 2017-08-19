@@ -20,7 +20,7 @@ class UsersController extends Controller
     {
         $users = User::paginate(10);
         
-        return view('users,index',[
+        return view('users.index',[
             'users' => $users,
             ]);
     }
@@ -101,7 +101,7 @@ class UsersController extends Controller
     {
         //
     }
-}
+
     public function followings($id)
     {
         $user = User::find($id);
@@ -131,3 +131,4 @@ class UsersController extends Controller
         
         return view('users.followers', $data);
     }
+}

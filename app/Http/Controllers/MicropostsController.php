@@ -90,7 +90,7 @@ class MicropostsController extends Controller
      */
     public function destroy($id)
     {
-    $micropost = App\Micropost::find($id);
+    $micropost = \App\Micropost::find($id);
     
     if(\Auth::user()->id === $micropost->user_id) {
         $micropost->delete();
