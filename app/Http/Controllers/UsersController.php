@@ -131,4 +131,20 @@ class UsersController extends Controller
         
         return view('users.followers', $data);
     }
+    
+    public function favorite($id)
+    {
+        $user = User::find($id);
+        $followings = $user->favorite()->paginate(10);
+       // dd($followings);
+        $data = [
+            'user' => $user,
+            'users' => $followings,
+        ];
+        
+        $data += $this->counts($user);
+        
+        return view('users.favorites', $data);
+    }
+    
 }
